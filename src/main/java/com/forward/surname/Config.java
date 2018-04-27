@@ -52,7 +52,7 @@ public class Config {
     }
 
     /**
-     * 设置tag
+     * 获取tag
      * @return
      */
     public  String getTag(){
