@@ -1,6 +1,6 @@
 package com.forward.surname.utils;
 
-import android.support.v4.BuildConfig;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -23,101 +23,65 @@ public class LogUtils {
     private static final int JSON_INDENT = 4;
 
     /**
-     *获取TAG
+     * 获取TAG
      */
-    private  static String getTag() {
+    private static String getTag() {
         return Config.getInstance().getTag();
     }
 
     /**
      * 获取DEBUG
      */
-    private  static boolean getDebug(){
-        return  Config.getInstance().getDebug();
+    private static boolean getDebug() {
+        return Config.getInstance().getDebug();
     }
+
+    /**
+     * 获取stacktrace
+     */
+    private static boolean getStackTrack() {
+        return Config.getInstance().getStackTrace();
+    }
+
 
     /**
      * debug
      */
     public static void d(String str, Object... objects) {
-        d(getTag(),str, objects);
+        if (!getDebug()) return;
+        Log.d(getTag(), buildLogString(str, objects));
     }
 
     /**
      * info
      */
     public static void i(String str, Object... objects) {
-        i(getTag(),str, objects);
+        if (!getDebug()) return;
+        Log.i(getTag(), buildLogString(str, objects));
     }
 
     /**
      * verbose
      */
     public static void v(String str, Object... objects) {
-
-        v(getTag(), str, objects);
+        if (!getDebug()) return;
+        Log.v(getTag(), buildLogString(str, objects));
     }
 
     /**
      * error
      */
     public static void e(String str, Object... objects) {
-        e(getTag(), str, objects);
+        if (!getDebug()) return;
+        Log.e(getTag(), buildLogString(str, objects));
     }
 
     /**
      * warning
      */
     public static void w(String str, Object... objects) {
-        w(getTag(),str, objects);
-    }
-
-
-
-
-    /**
-     * debug
-     */
-    public static void d(String tag,String str, Object... objects) {
-        if (getDebug()) {
-            Log.d(tag, buildLogString(str, objects));
-        }
-    }
-
-    /**
-     * info
-     */
-    public static void i(String tag,String str, Object... objects) {
-        if (getDebug()) {
-            Log.i(tag, buildLogString(str, objects));
-        }
-    }
-
-    /**
-     * verbose
-     */
-    public static void v(String tag,String str, Object... objects) {
-        if (getDebug()) {
-            Log.v(tag, buildLogString(str, objects));
-        }
-    }
-
-    /**
-     * error
-     */
-    public static void e(String tag,String str, Object... objects) {
-        if (getDebug()) {
-            Log.e(tag, buildLogString(str, objects));
-        }
-    }
-
-    /**
-     * warning
-     */
-    public static void w(String tag,String str, Object... objects) {
-        if (getDebug()) {
-            Log.w(tag, buildLogString(str, objects));
-        }
+        if (!getDebug()) return;
+        Log.w(getTag(), buildLogString(str, objects));
     }
 
 
@@ -130,140 +94,98 @@ public class LogUtils {
         if (args.length > 0) {
             str = String.format(str, args);
         }
-        StackTraceElement caller = new Throwable().fillInStackTrace().getStackTrace()[2];
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder
-                .append("(")
-                .append(caller.getFileName())
-                .append(":")
-                .append(caller.getLineNumber())
-                .append(").")
-                .append(caller.getMethodName())
-                .append("():")
-                .append(str);
-        return stringBuilder.toString();
+        if (getStackTrack()) {
+            StackTraceElement caller = new Throwable().fillInStackTrace().getStackTrace()[2];
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder
+                    .append("(")
+                    .append(caller.getFileName())
+                    .append(":")
+                    .append(caller.getLineNumber())
+                    .append(").")
+                    .append(caller.getMethodName())
+                    .append("():")
+                    .append(str);
+            return stringBuilder.toString();
+        }
+        return str;
     }
 
     /**
      * json with a title
-     *
      */
-    public static void jsonTitle(String str, String title) {
-        json(getTag(),str, title);
-    }
-    /**
-     * json with a title
-     *
-     */
-    public static void json(String tag,String str, String title) {
-        if (getDebug()) {
-            d(tag, "|===================================================================");
+    public static void json(String str, String title) {
+        if (!getDebug()) return;
+        Log.d(getTag(), buildLogString("|==================================================================="));
+        if (!TextUtils.isEmpty(title)) {
+            Log.d(getTag(), buildLogString("| " + title));
+            Log.d(getTag(), buildLogString("|-------------------------------------------------------------------"));
+        }
 
-            if (!TextUtils.isEmpty(title)) {
-                d(tag, "| " + title);
-                d(tag, "|-------------------------------------------------------------------");
-            }
-
-            String message;
-            try {
-                if (str.startsWith("{")) {
-                    JSONObject jsonObject = new JSONObject(str);
-                    message = jsonObject.toString(JSON_INDENT);
-                } else if (str.startsWith("[")) {
-                    JSONArray jsonArray = new JSONArray(str);
-                    message = jsonArray.toString(JSON_INDENT);
-                } else {
-                    message = str;
-                }
-            } catch (JSONException e) {
+        String message;
+        try {
+            if (str.startsWith("{")) {
+                JSONObject jsonObject = new JSONObject(str);
+                message = jsonObject.toString(JSON_INDENT);
+            } else if (str.startsWith("[")) {
+                JSONArray jsonArray = new JSONArray(str);
+                message = jsonArray.toString(JSON_INDENT);
+            } else {
                 message = str;
             }
-
-            String[] lines = message.split("\n");
-            for (String line : lines) {
-                d(tag, line);
-            }
-            d(tag, "===================================================================|");
+        } catch (JSONException e) {
+            message = str;
         }
+
+        String[] lines = message.split("\n");
+        for (String line : lines) {
+            Log.d(getTag(), buildLogString(line));
+        }
+        Log.d(getTag(), buildLogString("===================================================================|"));
     }
 
-
-    /**
-     * json
-     */
-    public static void json(String str) {
-        json(getTag(),str, null);
-    }
-
-    /**
-     * json
-     */
-    public static void json(String tag,String str) {
-        json(tag,str, null);
-    }
 
     /**
      * entity with a title
      */
-    public static  void entity(Object obj,Class<?> entityCls,Class<?extends Annotation>  annotationCls,String annotationkey) {
-        entity(getTag(),obj,entityCls,annotationCls,annotationkey,null);
-    }
+    public static void entity(Object obj, Class<?> entityCls, Class<? extends Annotation> annotationCls, String annotationkey, String title) {
+        if (!getDebug()) return;
 
-    /**
-     * entity with a title
-     */
-    public static  void entity(String tag,Object obj,Class<?> entityCls,Class<?extends Annotation>  annotationCls,String annotationkey) {
-        entity(tag,obj,entityCls,annotationCls,annotationkey,null);
-    }
+        Log.d(getTag(), buildLogString("|==================================================================="));
 
-    /**
-     * entity
-     */
-    public static  void entity(Object obj,Class<?> entityCls,Class<?extends Annotation>  annotationCls,String annotationkey,String title) {
-        entity(getTag(),obj,entityCls,annotationCls,annotationkey,title);
-    }
+        if (!TextUtils.isEmpty(title)) {
+            Log.d(getTag(), buildLogString("| " + title));
+            Log.d(getTag(), buildLogString("|-------------------------------------------------------------------"));
+        }
 
-    /**
-     * entity
-     */
-    public static  void entity(String tag,Object obj,Class<?> entityCls,Class<?extends Annotation>  annotationCls,String annotationkey,String title){
-            if (getDebug()) {
-                d(tag, "|===================================================================");
-
-                if (!TextUtils.isEmpty(title)) {
-                    d(tag, "| " + title);
-                    d(tag, "|-------------------------------------------------------------------");
-                }
-
-                try {
-                    Class entity = Class.forName(entityCls.getName());
-                    Field[] fields = entity.getDeclaredFields();
-                    for (Field field : fields) {
-                        if (field.isAnnotationPresent(annotationCls)) {
-                            Annotation annotation = field.getAnnotation(annotationCls);
-                            String strAnnotation = annotation.toString();
-                            String strHashMap = strAnnotation.substring(strAnnotation.indexOf("(") + 1, strAnnotation.indexOf(")"));
-                            String strValue = "";
-                            Map map = ConvertUtils.strToHashMap(strHashMap, ", ", "=");
-                            if (map != null) {
-                                Iterator iter = map.entrySet().iterator();
-                                while (iter.hasNext()) {
-                                    Map.Entry entry = (Map.Entry) iter.next();
-                                    Object key = entry.getKey();
-                                    if (key.toString().equalsIgnoreCase(annotationkey)) {
-                                        strValue = ConvertUtils.objToString(entry.getValue());
-                                        break;
-                                    }
-                                }
+        try {
+            Class entity = Class.forName(entityCls.getName());
+            Field[] fields = entity.getDeclaredFields();
+            for (int i=fields.length-1;i>=0;i--) {
+                Field field=fields[i];
+                if (field.isAnnotationPresent(annotationCls)) {
+                    Annotation annotation = field.getAnnotation(annotationCls);
+                    String strAnnotation = annotation.toString();
+                    String strHashMap = strAnnotation.substring(strAnnotation.indexOf("(") + 1, strAnnotation.indexOf(")"));
+                    String strValue = "";
+                    Map map = ConvertUtils.strToHashMap(strHashMap, ", ", "=");
+                    if (map != null) {
+                        Iterator iter = map.entrySet().iterator();
+                        while (iter.hasNext()) {
+                            Map.Entry entry = (Map.Entry) iter.next();
+                            Object key = entry.getKey();
+                            if (key.toString().equalsIgnoreCase(annotationkey)) {
+                                strValue = ConvertUtils.objToString(entry.getValue());
+                                break;
                             }
-                            d(tag, " %s:%s\n", strValue, ConvertUtils.objToString(field.get(obj)));
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.d(getTag(), buildLogString("    %s:%s\n", strValue, ConvertUtils.objToString(field.get(obj))));
                 }
-                d(tag, "===================================================================|");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.d(getTag(), buildLogString("===================================================================|"));
     }
-
 }

@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.3"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -39,7 +39,7 @@ dependencies {
 }
 
 // 项目引用的版本号，比如compile 'com.yanzhenjie:andserver:1.0.1'中的1.0.1就是这里配置的。
-version = "1.0.1"
+version = "1.0.3"
 
 // 定义两个链接，下面会用到。
 def siteUrl = 'https://github.com/zhangyong2014/surname' // 项目主页。
@@ -85,6 +85,8 @@ install {
         }
     }
 }
+
+
 // 生成jar包的task，不需要修改。
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
