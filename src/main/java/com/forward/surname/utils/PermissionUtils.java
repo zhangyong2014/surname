@@ -168,7 +168,7 @@ public class PermissionUtils {
     private static boolean checkPermissions(Context context, String... permissions) {
         if (isOverMarshmallow()) {
             for (String permission : permissions) {
-                if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED) {
+                if (ContextCompat.                                                                                                                                           checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED) {
                     return false;
                 }
             }

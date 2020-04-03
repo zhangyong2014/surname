@@ -17,7 +17,6 @@ import com.forward.surname.manager.FunctionManager;
  */
 
 public abstract class BaseFragment extends Fragment {
-    static final String TAG = "CommonFragment";
     static final String STATE_SAVE_IS_HIDDEN = "STATE_SAVE_IS_HIDDEN";
     protected Activity mActivity;
     protected View mRootView;
@@ -40,7 +39,7 @@ public abstract class BaseFragment extends Fragment {
         super.onAttach(context);
         if(context instanceof BaseActivity){
             BaseActivity activity = (BaseActivity) context;
-            activity.setFuctionsForFragment(getTag());
+            activity.setFuctionsForFragment(getTAG());
         }
 
     }
@@ -83,7 +82,7 @@ public abstract class BaseFragment extends Fragment {
             if (mbFirstShow) {
                 mbFirstShow = false;
                 mUIInitialize = true;
-                loadPage();
+                loadPage(savedInstanceState);
             }
         } else{
             ViewGroup parent = (ViewGroup) mRootView.getParent();
@@ -129,6 +128,9 @@ public abstract class BaseFragment extends Fragment {
     public abstract View initViews();
 
     // 加载页面信息，默认是在第一次初始化的时候会调用
-    public abstract void loadPage();
+    public abstract void loadPage(Bundle savedInstanceState);
+
+    //获取tag
+    public abstract String  getTAG();
 
 }

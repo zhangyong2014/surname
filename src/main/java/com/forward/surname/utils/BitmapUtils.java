@@ -48,6 +48,9 @@ import android.view.View;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -57,9 +60,115 @@ import java.io.InputStream;
  * @author jingle1267@163.com
  */
 public final class BitmapUtils {
-
     private static final boolean DEBUG = false;
+    public static final int MAX_IMAGE_WIDTH = 800; // 最大的图片宽度 in px
     private static final String TAG = BitmapUtils.class.getSimpleName();
+
+    public static Rect getBitmapSize(String path) {
+        Rect rc = new Rect();
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, opts);
+        rc.right = opts.outWidth;
+        rc.bottom = opts.outHeight;
+        return rc;
+    }
+
+    /*
+     * 将对应的bitmap对象保存至文件,默认配置
+     */
+    public static boolean saveBitmap(Bitmap bitmap, String path) {
+        return saveBitmap(bitmap, path, Bitmap.CompressFormat.JPEG, 90);
+    }
+
+    /*
+     * 将对应的bitmap对象保存至文件。
+     */
+    public static boolean saveBitmap(Bitmap bitmap, String path,
+                                     Bitmap.CompressFormat format, int quality) {
+        File f = new File(path);
+        if (f.exists())
+            f.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            bitmap.compress(format, quality, out);
+            out.flush();
+            out.close();
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 转换Bitmap大小，会保证图片比例.
+     *
+     * @return
+     */
+    public static Bitmap convertBitmap(String path, int width) {
+        try {
+            Rect rcImage = getBitmapSize(path);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inSampleSize = rcImage.width() / width;
+            opts.inJustDecodeBounds = false;
+            Bitmap bitmap = BitmapFactory.decodeFile(path, opts);
+            return bitmap;
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
+
+
+    /**
+     * 转换Bitmap大小，转换到指定的大小.
+     *
+     * @return
+     */
+    public static Bitmap convertBitmap(String path, int width, int height) {
+        try {
+
+            Bitmap bitmapSrc = convertBitmap(path,MAX_IMAGE_WIDTH);
+            if (bitmapSrc == null)
+                return null;
+
+            // 计算缩放比例
+            float scaleWidth = ((float) width) / bitmapSrc.getWidth();
+            float scaleHeight = ((float) height) / bitmapSrc.getHeight();
+
+            // 取得想要缩放的matrix参数
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleWidth, scaleHeight);
+
+            // 得到新的图片
+            Bitmap bitmap = Bitmap.createBitmap(bitmapSrc, 0, 0, bitmapSrc.getWidth(), bitmapSrc.getHeight(), matrix, true);
+            return bitmap;
+
+        } catch (Exception e) {
+            Log.e("ImageCompressTask", e.toString());
+        }
+        return null;
+    }
+
+    /**
+     * 压缩图片
+     * @param src
+     * @param dest
+     * @param width
+     * @return
+     */
+    public static Boolean convertBitmap(String src, String dest, int width) {
+        Bitmap bitmap = convertBitmap(src,width);
+        if (bitmap == null)
+            return false;
+        if (!BitmapUtils.saveBitmap(bitmap, dest))
+            return false;
+        bitmap.recycle();
+        return true;
+    }
 
     /**
      * Don't let anyone instantiate this class.

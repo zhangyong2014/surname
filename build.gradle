@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 5
-        versionName "1.0.5"
+        versionCode 9
+        versionName "1.0.9"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -26,20 +26,22 @@ android {
     lintOptions {
         abortOnError false
     }
-
 }
-
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:recyclerview-v7:26.+'
-    implementation 'com.android.support:appcompat-v7:26.1.0'
     testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
 
 // 项目引用的版本号，比如compile 'com.yanzhenjie:andserver:1.0.1'中的1.0.1就是这里配置的。
-version = "1.0.5"
+version = "1.0.9"
 
 // 定义两个链接，下面会用到。
 def siteUrl = 'https://github.com/zhangyong2014/surname' // 项目主页。
@@ -99,6 +101,7 @@ task javadoc(type: Javadoc) {
     //destinationDir = file("../javadoc/")
     failOnError false // 忽略注释语法错误，如果用jdk1.8你的注释写的不规范就编译不过。
 }
+
 // 生成javaDoc的jar，不需要修改。
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
@@ -108,6 +111,8 @@ artifacts {
     archives javadocJar
     archives sourcesJar
 }
+
+
 
 // 这里是读取Bintray相关的信息，我们上传项目到github上的时候会把gradle文件传上去，所以不要把帐号密码的信息直接写在这里，写在local.properties中，这里动态读取。
 Properties properties = new Properties()

@@ -105,7 +105,8 @@ public abstract class BaseActivity extends AppCompatActivity{
         BaseFragment fragment = (BaseFragment) fm.findFragmentByTag(tag);
         FunctionManager functionManager = FunctionManager.getInstance();
         impFunction(functionManager);
-        fragment.setFunctionManager(functionManager);
+        if(fragment!=null)
+            fragment.setFunctionManager(functionManager);
     }
 
     /**
