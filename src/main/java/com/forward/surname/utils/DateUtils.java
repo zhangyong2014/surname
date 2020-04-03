@@ -17,6 +17,7 @@ package com.forward.surname.utils;
 
 import android.text.TextUtils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,6 +39,121 @@ public final class DateUtils {
     public static final String LOCALE_DATE_FORMAT = "yyyy年M月d日 HH:mm:ss";
     public static final String DB_DATA_FORMAT = "yyyy-MM-DD HH:mm:ss";
     public static final String NEWS_ITEM_DATE_FORMAT = "hh:mm M月d日 yyyy";
+
+    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static DateFormat noIntervalTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    private static DateFormat timeStampFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    private static DateFormat gpsTimeFormat = new SimpleDateFormat("HHmmssddMMyy");
+
+
+    // 日期字符串
+    public static Date parseDate(String dateString){
+        try {
+            return dateFormat.parse(dateString);
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String formatDate(Date date){
+        return dateFormat.format(date);
+    }
+
+
+    // 日期时间字符串
+    public static Date parseTime(String timeString){
+        try {
+            return timeFormat.parse(timeString);
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String formatTime(Date date){
+        return timeFormat.format(date);
+    }
+
+    // 日期时间连续排列
+
+    public static Date parseNoIntervalTime(String timeString){
+        try {
+            return noIntervalTimeFormat.parse(timeString);
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String formatNoIntervalTime(Date date){
+        return noIntervalTimeFormat.format(date);
+    }
+
+
+    // 日期时间（毫秒）连续排列
+    public static Date parseTimeStamp(String timeStampString){
+        try {
+            return timeFormat.parse(timeStampString);
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String formatTimeStamp(Date date){
+        return timeStampFormat.format(date);
+    }
+
+
+    // GPS日期时间格式
+    public static Date parseGPSTime(String gpsTimeString){
+        try {
+            return gpsTimeFormat.parse(gpsTimeString);
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String formatGPSTime(Date date){
+        return gpsTimeFormat.format(date);
+    }
+
+
+    // 计算时间差，返回格式化后的字符串
+    public static String timeSpanString(Date former, Date latter){
+        long timeSpan = (latter.getTime() - former.getTime())/1000;
+        long day=timeSpan/(24*3600);
+        long hour=timeSpan%(24*3600)/3600;
+        long minute=timeSpan%3600/60;
+        long second=timeSpan%60;
+
+        String timeSpanStr = "";
+        if(day > 0) timeSpanStr += day + "天";
+        if(hour > 0) timeSpanStr += hour + "小时";
+
+        if(minute > 0 && day == 0) {
+            timeSpanStr += minute + "分";
+        }
+
+        if(second > 0 && day == 0 && hour == 0) {
+            timeSpanStr += second + "秒";
+        }
+
+        return timeSpanStr;
+    }
+
+    // 计算时间差，返回秒数
+    public static long timeSpanSeconds(Date former, Date latter){
+        return (latter.getTime() - former.getTime())/1000;
+    }
 
 
     public static String dateToString(Date date, String pattern)
